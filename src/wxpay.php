@@ -8,8 +8,6 @@
 
 namespace reborn\wxpay;
 
-use think\facade\Request;
-
 class wxpay
 {
     private $app_id;
@@ -31,7 +29,7 @@ class wxpay
      * 2019/3/13 16:50:06
      * @return array
      */
-    public function pay($order)
+    public function pay($data)
     {
 //        $wx['mch_id']='xxx';
 //        $wx['app_id']='xxx';
@@ -48,15 +46,6 @@ class wxpay
 //        $data['trade_type']         = 'JSAPI';//JSAPI，NATIVE
 //        $data['openid']             = "xxxx";//trade_type为JSAPI时，必须
 
-        $data['attach']             = '1';//用户id
-        $data['nonce_str']          = time() . mt_rand(10000,99999);//订单编号
-        $data['body']               = '测试123';//产品描述
-        $data['out_trade_no']       = '00220190307104645';//订单号
-        $data['total_fee']          = 1 * 100;//单位分
-        $data['spbill_create_ip']   = Request::ip();
-        $data['notify_url']         = "http://" . $_SERVER['HTTP_HOST'] . '/small/wxnotify';//异步回调地址
-        $data['trade_type']         = 'JSAPI';//JSAPI，NATIVE
-        $data['openid']             = "xxxx";//trade_type为JSAPI时，必须
         $resA = (new wxservice( $this->app_id,$this->app_secret,$this->key,$this->mch_id))->setOrder($data);
         $res  = self::xmlToArray($resA);
         $rdata = [];
