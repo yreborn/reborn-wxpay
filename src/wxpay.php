@@ -24,6 +24,28 @@ class wxpay
     }
 
     /**
+     * 订单查询
+     * User: Reborn
+     * 2019/4/19 16:35:13
+     * @param $order
+     * @return array
+     */
+    public function orderQuery($order)
+    {
+        $resA = (new wxservice( $this->app_id,$this->app_secret,$this->key,$this->mch_id))->orderQuery($order);
+        $res  = self::xmlToArray($resA);
+        if (!empty($res) && $res['return_code'] == 'SUCCESS'){
+            if ($res['result_code'] == 'SUCCESS'){
+                return ['code'=>200,'msg'=>'微信查询成功',$res];
+            }else{
+                return ['code'=>400,'msg'=>'微信查询失败'];
+            }
+        }else{
+            return ['code'=>400,'msg'=>'微信查询失败'];
+        }
+    }
+
+    /**
      * 微信支付
      * User: Reborn
      * 2019/3/13 16:50:06
