@@ -24,6 +24,25 @@ class wxservice
     }
 
     /**
+     * 微信退款
+     * User: Reborn
+     * 2019/4/23 10:42:28
+     * @param $order
+     * @return bool|string
+     */
+    public function refund($data)
+    {
+        $url = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+
+        $data['appid']= $this->app_id;
+        $data['mch_id']= $this->mch_id;
+        $data['sign'] = $this->getSign($data);//获取签名
+        $xml  = $this->toXml($data);          //下单参数数组转为xml
+        $res  = $this->getCurl($url,true,'post',$xml,true);
+        return $res;
+    }
+
+    /**
      * 订单查询
      * Time: 2018/12/11 14:17
      * @param $order
@@ -109,7 +128,7 @@ class wxservice
      * @param null $data
      * @return bool|string
      */
-    function getCurl($url, $https = true, $method = 'get', $data = null)
+    function getCurl($url, $https = true, $method = 'get', $data = null,$useCert=false)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);//设置访问的url；
@@ -122,6 +141,13 @@ class wxservice
         if($method == 'post'){
             curl_setopt($ch, CURLOPT_POST, true);//设置请求方式，
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data);//设置POST请求的数据，
+        }
+        if($useCert == true){
+            //使用证书：cert 与 key 分别属于两个.pem文件
+            curl_setopt($ch,CURLOPT_SSLCERTTYPE,'PEM');
+            curl_setopt($ch,CURLOPT_SSLKEYTYPE,'PEM');
+            curl_setopt($ch,CURLOPT_SSLCERT, $data['certurl']);
+            curl_setopt($ch,CURLOPT_SSLKEY, $data['keyurl']);
         }
         $result = curl_exec($ch);//执行访问，返回结果,
         return $result;

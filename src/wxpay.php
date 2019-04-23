@@ -15,12 +15,34 @@ class wxpay
     private $key;
     private $mch_id;
 
-    public function __construct($appid, $appsecret,$key,$mch_id)
+    public function __construct($data)
     {
-        $this->key=$key;
-        $this->app_id=$appid;
-        $this->mch_id=$mch_id;
-        $this->app_secret=$appsecret;
+        $this->key=$data['key'];
+        $this->app_id=$data['app_id'];
+        $this->mch_id=$data['mch_id'];
+        $this->app_secret=$data['app_secret'];
+    }
+
+    /**
+     * 订单退款
+     * User: Reborn
+     * 2019/4/19 16:35:13
+     * @param $order
+     * @return array
+     */
+    public function orderRefund($order)
+    {
+        $resA = (new wxservice($this->app_id,$this->app_secret,$this->key,$this->mch_id))->refund($order);
+        $res  = self::xmlToArray($resA);
+        if (!empty($res) && $res['return_code'] == 'SUCCESS'){
+            if ($res['result_code'] == 'SUCCESS'){
+                return ['code'=>200,'msg'=>'微信退款成功',$res];
+            }else{
+                return ['code'=>400,'msg'=>'微信退款失败'];
+            }
+        }else{
+            return ['code'=>400,'msg'=>'微信退款失败'];
+        }
     }
 
     /**
@@ -32,18 +54,19 @@ class wxpay
      */
     public function orderQuery($order)
     {
-        $resA = (new wxservice( $this->app_id,$this->app_secret,$this->key,$this->mch_id))->orderQuery($order);
+        $resA = (new wxservice($this->app_id,$this->app_secret,$this->key,$this->mch_id))->orderQuery($order);
         $res  = self::xmlToArray($resA);
         if (!empty($res) && $res['return_code'] == 'SUCCESS'){
             if ($res['result_code'] == 'SUCCESS'){
-                return ['code'=>200,'msg'=>'微信查询成功',$res];
+                return ['code'=>200,'msg'=>'微信退款成功',$res];
             }else{
-                return ['code'=>400,'msg'=>'微信查询失败'];
+                return ['code'=>400,'msg'=>'微信退款失败'];
             }
         }else{
-            return ['code'=>400,'msg'=>'微信查询失败'];
+            return ['code'=>400,'msg'=>'微信退款失败'];
         }
     }
+
 
     /**
      * 微信支付
